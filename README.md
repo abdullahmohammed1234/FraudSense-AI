@@ -186,7 +186,7 @@ This will:
 ### Option 1: Direct Python
 ```bash
 cd backend
-python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload
 ```
 
 ### Option 2: Docker
@@ -198,7 +198,7 @@ docker-compose up --build
 The model is already trained. Run:
 ```bash
 cd backend
-python -m uvicorn main:app --host 0.0.0.0 --port 8000
+python -m uvicorn main:app --host 0.0.0.0 --port 8001
 ```
 
 ## API Endpoints
@@ -224,10 +224,10 @@ python -m uvicorn main:app --host 0.0.0.0 --port 8000
 ## Frontend Dashboard
 
 Access the web interface at:
-- Main: http://localhost:8000/
-- Dashboard: http://localhost:8000/dashboard
-- Analysis: http://localhost:8000/analysis
-- History: http://localhost:8000/history
+- Main: http://localhost:8001/
+- Dashboard: http://localhost:8001/dashboard
+- Analysis: http://localhost:8001/analysis
+- History: http://localhost:8001/history
 
 ## Authentication
 
@@ -247,7 +247,7 @@ X-API-Key: dev-key-001
 ## Example API Call
 
 ```bash
-curl -X POST http://localhost:8000/predict \
+curl -X POST http://localhost:8001/predict \
   -H "Content-Type: application/json" \
   -H "X-API-Key: dev-key-001" \
   -d '{
@@ -266,7 +266,7 @@ curl -X POST http://localhost:8000/predict \
 
 Create .env from .env.example:
 ```env
-API_PORT=8000
+API_PORT=8001
 LOG_LEVEL=INFO
 API_KEYS=dev-key-001:Admin:1000,analyst-key-001:Analyst:500,auditor-key-001:Auditor:200
 ```

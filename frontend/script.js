@@ -3,6 +3,14 @@
 
 const API_BASE = 'http://localhost:8001';
 
+// Feature name mapping for SHAP/Top Factors display
+const FEATURE_NAME_MAP = {
+    "V14": "Beneficiary Trust Score",
+    "V4": "IP Geolocation Mismatch",
+    "V12": "Device Fingerprint Risk",
+    "Amount": "Transaction Amount"
+};
+
 // State
 let currentPrediction = null;
 let analyticsInterval = null;
@@ -425,14 +433,17 @@ function updateRiskFactors(factors) {
         return;
     }
     
-    elements.riskFactors.innerHTML = factors.map(factor => `
+    elements.riskFactors.innerHTML = factors.map(factor => {
+        const displayName = FEATURE_NAME_MAP[factor.feature] || factor.feature;
+        return `
         <div class="factor-item">
-            <span>${factor.feature}</span>
+            <span>${displayName}</span>
             <span class="factor-impact ${factor.impact > 0 ? 'positive' : 'negative'}">
                 ${factor.impact > 0 ? '+' : ''}${factor.impact.toFixed(4)}
             </span>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Update Action Recommendation

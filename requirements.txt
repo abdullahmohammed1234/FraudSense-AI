@@ -1,0 +1,11 @@
+# FraudSense AI - Requirements
+# Real-time fraud detection system using Credit Card Fraud Detection dataset
+
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+xgboost
+shap
+joblib

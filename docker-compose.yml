@@ -1,0 +1,36 @@
+# =============================================================================
+# FraudSense AI - Docker Compose Configuration
+# =============================================================================
+# Production-ready configuration (API only without nginx)
+
+services:
+  # Main API service
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fraudsense-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - API_KEYS=${API_KEYS:-dev-key-001:Admin:1000,analyst-key-001:Analyst:500,auditor-key-001:Auditor:200}
+    volumes:
+      - ./logs:/app/logs
+      - ./backend/logs:/app/backend/logs
+      - ./backend/model.pkl:/app/model.pkl
+      - ./backend/anomaly_model.pkl:/app/anomaly_model.pkl
+      - ./backend/explainer.pkl:/app/explainer.pkl
+      - ./backend/model_metadata.json:/app/model_metadata.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  fraudsense-network:
+    driver: bridge

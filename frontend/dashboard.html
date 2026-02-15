@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | FraudSense AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">FraudSense AI</span>
+                </div>
+                <div class="header-badge">ENTERPRISE</div>
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="header-nav">
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="analysis.html" class="nav-link">Analysis</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="settings.html" class="nav-link">Settings</a>
+            </nav>
+            
+            <div class="header-center">
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span>LIVE</span>
+                </div>
+                <div class="system-time" id="systemTime">--:--:--</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="model-version" id="modelVersion">
+                    <span class="version-label">Model</span>
+                    <span class="version-number">v1.0.0</span>
+                </div>
+                <div class="drift-indicator" id="driftIndicator">
+                    <span class="drift-dot"></span>
+                    <span class="drift-text">DRIFT</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Stats Row -->
+            <div class="stats-row">
+                <!-- Model Health Panel -->
+                <div class="card model-health">
+                    <div class="card-header">
+                        <h3>Model Health</h3>
+                        <div class="status-badge healthy" id="modelStatus">OPERATIONAL</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="health-grid">
+                            <div class="health-item">
+                                <span class="health-label">ROC-AUC</span>
+                                <span class="health-value" id="rocAuc">0.954</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="health-label">Precision</span>
+                                <span class="health-value" id="precision">0.883</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="health-label">Recall</span>
+                                <span class="health-value" id="recall">0.821</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="health-label">Threshold</span>
+                                <span class="health-value" id="threshold">0.50</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Score Gauge -->
+                <div class="card risk-gauge-card">
+                    <div class="card-header">
+                        <h3>Final Risk Score</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="gauge-container">
+                            <svg class="gauge" viewBox="0 0 140 90">
+                                <defs>
+                                    <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#10b981"/>
+                                        <stop offset="33%" style="stop-color:#f59e0b"/>
+                                        <stop offset="66%" style="stop-color:#ef4444"/>
+                                        <stop offset="100%" style="stop-color:#7c3aed"/>
+                                    </linearGradient>
+                                </defs>
+                                <path class="gauge-bg" d="M 15 75 A 55 55 0 0 1 125 75" fill="none" stroke="#1e293b" stroke-width="12" stroke-linecap="round"/>
+                                <path class="gauge-fill" id="gaugeFill" d="M 15 75 A 55 55 0 0 1 125 75" fill="none" stroke="url(#gaugeGradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="173" stroke-dashoffset="173"/>
+                                <circle class="gauge-needle" id="gaugeNeedle" cx="70" cy="75" r="5" fill="#fff"/>
+                            </svg>
+                            <div class="gauge-value">
+                                <span class="value" id="riskScoreValue">0.00</span>
+                                <span class="label">RISK SCORE</span>
+                            </div>
+                            <div class="gauge-band" id="riskBand">LOW</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Stats -->
+                <div class="card live-stats">
+                    <div class="card-header">
+                        <h3>Live Statistics</h3>
+                        <div class="pulse-dot"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Transactions</span>
+                            <span class="stat-value" id="totalTransactions">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Fraud Rate</span>
+                            <span class="stat-value fraud" id="fraudRate">0.00%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">High Risk</span>
+                            <span class="stat-value" id="highRiskCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Avg Probability</span>
+                            <span class="stat-value" id="avgProbability">0.000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latency Indicator -->
+                <div class="card latency-card">
+                    <div class="card-header">
+                        <h3>Inference Latency</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="latency-display">
+                            <span class="latency-value" id="latencyValue">0</span>
+                            <span class="latency-unit">ms</span>
+                        </div>
+                        <div class="latency-bar">
+                            <div class="latency-fill" id="latencyFill"></div>
+                        </div>
+                        <div class="latency-stats">
+                            <span>Min: <b id="minLatency">0</b>ms</span>
+                            <span>Max: <b id="maxLatency">0</b>ms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Stats -->
+            <div class="bottom-stats">
+                <div class="card risk-distribution">
+                    <div class="card-header">
+                        <h3>Risk Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="distribution-bars">
+                            <div class="dist-item">
+                                <div class="dist-bar low" id="distLow" style="height: 0%"></div>
+                                <span class="dist-label">Low</span>
+                                <span class="dist-value" id="distLowVal">0</span>
+                            </div>
+                            <div class="dist-item">
+                                <div class="dist-bar medium" id="distMedium" style="height: 0%"></div>
+                                <span class="dist-label">Medium</span>
+                                <span class="dist-value" id="distMediumVal">0</span>
+                            </div>
+                            <div class="dist-item">
+                                <div class="dist-bar high" id="distHigh" style="height: 0%"></div>
+                                <span class="dist-label">High</span>
+                                <span class="dist-value" id="distHighVal">0</span>
+                            </div>
+                            <div class="dist-item">
+                                <div class="dist-bar critical" id="distCritical" style="height: 0%"></div>
+                                <span class="dist-label">Critical</span>
+                                <span class="dist-value" id="distCriticalVal">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card action-distribution">
+                    <div class="card-header">
+                        <h3>Action Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="action-stats">
+                            <div class="action-stat">
+                                <span class="action-stat-icon block">⛔</span>
+                                <div class="action-stat-info">
+                                    <span class="action-stat-value" id="blockedCount">0</span>
+                                    <span class="action-stat-label">Blocked</span>
+                                </div>
+                            </div>
+                            <div class="action-stat">
+                                <span class="action-stat-icon review">👁️</span>
+                                <div class="action-stat-info">
+                                    <span class="action-stat-value" id="reviewCount">0</span>
+                                    <span class="action-stat-label">Review</span>
+                                </div>
+                            </div>
+                            <div class="action-stat">
+                                <span class="action-stat-icon approve">✓</span>
+                                <div class="action-stat-info">
+                                    <span class="action-stat-value" id="approvedCount">0</span>
+                                    <span class="action-stat-label">Approved</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stress-test-card">
+                    <div class="card-header">
+                        <h3>Stress Test</h3>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-stress" id="stressTestBtn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                            </svg>
+                            Run 1000 Transactions
+                        </button>
+                        <div class="stress-results" id="stressResults" style="display: none;">
+                            <div class="stress-stat">
+                                <span>Processed</span>
+                                <b id="stressProcessed">0</b>
+                            </div>
+                            <div class="stress-stat">
+                                <span>Avg Time</span>
+                                <b id="stressAvgTime">0ms</b>
+                            </div>
+                            <div class="stress-stat">
+                                <span>Throughput</span>
+                                <b id="stressTps">0 TPS</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Dashboard-only initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            initClock();
+            loadDashboardData();
+            startAnalyticsPolling();
+            
+            // Stress test
+            const stressBtn = document.getElementById('stressTestBtn');
+            if (stressBtn) {
+                stressBtn.addEventListener('click', runStressTest);
+            }
+        });
+    </script>
+</body>
+</html>

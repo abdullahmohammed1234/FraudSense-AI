@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | FraudSense AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">FraudSense AI</span>
+                </div>
+                <div class="header-badge">ENTERPRISE</div>
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="header-nav">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="analysis.html" class="nav-link">Analysis</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="settings.html" class="nav-link active">Settings</a>
+            </nav>
+            
+            <div class="header-center">
+                <div class="system-time" id="systemTime">--:--:--</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="model-version">
+                    <span class="version-label">Model</span>
+                    <span class="version-number">v1.0.0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="settings-container">
+                <div class="settings-section">
+                    <h2>Model Settings</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Detection Threshold</span>
+                            <span class="setting-desc">Threshold for fraud classification</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="range" id="thresholdSlider" min="0" max="100" value="50">
+                            <span class="setting-value" id="thresholdValue">0.50</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Auto-refresh</span>
+                            <span class="setting-desc">Automatically refresh dashboard data</span>
+                        </div>
+                        <div class="setting-control">
+                            <label class="toggle">
+                                <input type="checkbox" id="autoRefresh" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">Refresh Interval</span>
+                            <span class="setting-desc">Seconds between refreshes</span>
+                        </div>
+                        <div class="setting-control">
+                            <select id="refreshInterval">
+                                <option value="5">5 seconds</option>
+                                <option value="10" selected>10 seconds</option>
+                                <option value="30">30 seconds</option>
+                                <option value="60">1 minute</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>API Configuration</h2>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">API Endpoint</span>
+                            <span class="setting-desc">Backend server URL</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="text" id="apiEndpoint" value="http://localhost:8001">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>About</h2>
+                    <div class="about-info">
+                        <p><strong>FraudSense AI</strong> v1.0.0</p>
+                        <p>Enterprise Fraud Detection Platform</p>
+                        <p class="muted">Machine learning powered transaction analysis</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Settings-only initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            initClock();
+            initSettingsEvents();
+        });
+    </script>
+</body>
+</html>

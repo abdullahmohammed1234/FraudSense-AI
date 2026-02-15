@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis | FraudSense AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">FraudSense AI</span>
+                </div>
+                <div class="header-badge">ENTERPRISE</div>
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="header-nav">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="analysis.html" class="nav-link active">Analysis</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="settings.html" class="nav-link">Settings</a>
+            </nav>
+            
+            <div class="header-center">
+                <div class="system-time" id="systemTime">--:--:--</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="model-version">
+                    <span class="version-label">Model</span>
+                    <span class="version-number">v1.0.0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Main Prediction Area -->
+            <div class="prediction-area">
+                <!-- Transaction Input -->
+                <div class="card transaction-input">
+                    <div class="card-header">
+                        <h3>Transaction Analysis</h3>
+                        <div class="action-badge" id="actionBadge">READY</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-form">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label>Amount</label>
+                                    <input type="number" id="amountInput" placeholder="0.00" step="0.01">
+                                </div>
+                                <div class="input-group">
+                                    <label>Time (seconds from first transaction)</label>
+                                    <input type="number" id="timeInput" placeholder="0" step="1">
+                                </div>
+                            </div>
+                            
+                            <div class="feature-grid">
+                                <div class="feature-input"><label>V1</label><input type="number" id="v1" step="0.01"></div>
+                                <div class="feature-input"><label>V2</label><input type="number" id="v2" step="0.01"></div>
+                                <div class="feature-input"><label>V3</label><input type="number" id="v3" step="0.01"></div>
+                                <div class="feature-input"><label>V4</label><input type="number" id="v4" step="0.01"></div>
+                                <div class="feature-input"><label>V5</label><input type="number" id="v5" step="0.01"></div>
+                                <div class="feature-input"><label>V6</label><input type="number" id="v6" step="0.01"></div>
+                                <div class="feature-input"><label>V7</label><input type="number" id="v7" step="0.01"></div>
+                                <div class="feature-input"><label>V8</label><input type="number" id="v8" step="0.01"></div>
+                                <div class="feature-input"><label>V9</label><input type="number" id="v9" step="0.01"></div>
+                                <div class="feature-input"><label>V10</label><input type="number" id="v10" step="0.01"></div>
+                                <div class="feature-input"><label>V11</label><input type="number" id="v11" step="0.01"></div>
+                                <div class="feature-input"><label>V12</label><input type="number" id="v12" step="0.01"></div>
+                                <div class="feature-input"><label>V13</label><input type="number" id="v13" step="0.01"></div>
+                                <div class="feature-input"><label>V14</label><input type="number" id="v14" step="0.01"></div>
+                                <div class="feature-input"><label>V15</label><input type="number" id="v15" step="0.01"></div>
+                                <div class="feature-input"><label>V16</label><input type="number" id="v16" step="0.01"></div>
+                            </div>
+                            
+                            <div class="button-row">
+                                <button class="btn btn-primary" id="analyzeBtn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                                    </svg>
+                                    Analyze Transaction
+                                </button>
+                                <button class="btn btn-secondary" id="simulateBtn">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M23 4v6h-6M1 20v-6h6"/>
+                                        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+                                    </svg>
+                                    Simulate Live
+                                </button>
+                                <button class="btn btn-ghost" id="clearBtn">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="card results-panel">
+                    <div class="card-header">
+                        <h3>Analysis Results</h3>
+                        <div class="result-id" id="transactionId">--</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <span class="result-label">Fraud Probability</span>
+                                <div class="result-bar-container">
+                                    <div class="result-bar" id="fraudProbBar"></div>
+                                </div>
+                                <span class="result-value" id="fraudProbability">0.000</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Anomaly Score</span>
+                                <div class="result-bar-container">
+                                    <div class="result-bar anomaly" id="anomalyBar"></div>
+                                </div>
+                                <span class="result-value" id="anomalyScore">0.000</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Ensemble Risk</span>
+                                <div class="result-bar-container">
+                                    <div class="result-bar risk" id="riskBar"></div>
+                                </div>
+                                <span class="result-value" id="ensembleRisk">0.000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-factors">
+                            <h4>Top Risk Factors</h4>
+                            <div class="factors-list" id="riskFactors">
+                                <div class="factor-item">--</div>
+                            </div>
+                        </div>
+                        
+                        <div class="action-recommendation">
+                            <h4>Recommendation</h4>
+                            <div class="action-box" id="actionBox">
+                                <span class="action-icon" id="actionIcon">✓</span>
+                                <span class="action-text" id="actionText">Ready to analyze</span>
+                            </div>
+                            <p class="action-reasoning" id="actionReasoning">Enter transaction data or simulate a live transaction</p>
+                        </div>
+                        
+                        <div class="explanation">
+                            <h4>Explanation</h4>
+                            <p id="explanation">The analysis will provide a human-readable explanation of the risk factors.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Analysis-only initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            initClock();
+            initAnalysisEvents();
+        });
+    </script>
+</body>
+</html>

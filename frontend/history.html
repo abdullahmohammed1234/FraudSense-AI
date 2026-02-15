@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History | FraudSense AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M12 8v4M12 16h.01"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">FraudSense AI</span>
+                </div>
+                <div class="header-badge">ENTERPRISE</div>
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="header-nav">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="analysis.html" class="nav-link">Analysis</a>
+                <a href="history.html" class="nav-link active">History</a>
+                <a href="settings.html" class="nav-link">Settings</a>
+            </nav>
+            
+            <div class="header-center">
+                <div class="system-time" id="systemTime">--:--:--</div>
+            </div>
+            
+            <div class="header-right">
+                <div class="model-version">
+                    <span class="version-label">Model</span>
+                    <span class="version-number">v1.0.0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- History Container -->
+            <div class="history-container">
+                <div class="history-header">
+                    <h2>Transaction History</h2>
+                    <div class="history-filters">
+                        <input type="text" id="historySearch" placeholder="Search transaction ID...">
+                        <select id="historyFilter">
+                            <option value="all">All</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="review">Review</option>
+                            <option value="approved">Approved</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="history-table-container">
+                    <table class="audit-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Transaction ID</th>
+                                <th>Fraud Prob</th>
+                                <th>Risk Level</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #64748b; padding: 40px;">No transactions yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // History-only initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            initClock();
+            initHistoryEvents();
+            loadHistoryData();
+        });
+    </script>
+</body>
+</html>

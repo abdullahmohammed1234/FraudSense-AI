@@ -12,40 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <!-- Welcome Screen -->
-    <div class="welcome-overlay" id="welcomeOverlay">
-        <div class="welcome-content">
-            <div class="welcome-logo">
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M4 12L10 6L16 12L10 18L4 12Z" fill="currentColor"/>
-                    <path d="M10 12L16 6L22 12L16 18L10 12Z" fill="currentColor" opacity="0.5"/>
-                </svg>
-            </div>
-            <h1>Welcome to FraudSense AI</h1>
-            <h2>Your Enterprise Fraud Detection Dashboard</h2>
-            <div class="welcome-stats">
-                <div class="welcome-stat">
-                    <div class="welcome-stat-value" id="welcomeModelHealth">99.2%</div>
-                    <div class="welcome-stat-label">Model Accuracy</div>
-                </div>
-                <div class="welcome-stat">
-                    <div class="welcome-stat-value" id="welcomeTransactions">12,847</div>
-                    <div class="welcome-stat-label">Today's Transactions</div>
-                </div>
-                <div class="welcome-stat">
-                    <div class="welcome-stat-value" id="welcomeThreats">99</div>
-                    <div class="welcome-stat-label">Threats Blocked</div>
-                </div>
-            </div>
-            <button class="btn btn-primary welcome-btn" id="welcomeStartBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-                Enter Dashboard
-            </button>
-        </div>
-    </div>
-
     <div class="app-container has-sidebar" id="appContainer">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">

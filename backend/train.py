@@ -43,6 +43,7 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from preprocessing import preprocess_data, get_class_weights, get_scale_pos_weight, load_dataset
+from advanced_models import train_advanced_models, load_advanced_models, run_model_improvements
 
 
 # Default dataset path
@@ -151,9 +152,10 @@ def train_logistic_regression(
     
     model = LogisticRegression(
         class_weight="balanced",
-        max_iter=1000,
+        max_iter=3000,
         random_state=42,
-        solver="lbfgs"
+        solver="liblinear",
+        tol=1e-3
     )
     
     model.fit(X_train, y_train)
@@ -364,9 +366,10 @@ def stratified_cross_validation(
         if model_type == "lr":
             fold_model = LogisticRegression(
                 class_weight="balanced",
-                max_iter=1000,
+                max_iter=3000,
                 random_state=42,
-                solver="lbfgs"
+                solver="liblinear",
+                tol=1e-3
             )
         elif model_type == "rf":
             fold_model = RandomForestClassifier(
@@ -741,19 +744,21 @@ def print_training_summary(
         print(f"✗ Target ROC-AUC ≥ 0.95 NOT achieved (current: {metrics[best_model_name]['roc_auc']:.4f})")
 
 
-def train_models(dataset_path: str = DEFAULT_DATASET_PATH, use_cv: bool = True) -> None:
+def train_models(dataset_path: str = DEFAULT_DATASET_PATH, use_cv: bool = True, use_advanced: bool = True) -> None:
     """
     Main training function that trains all models and saves the best one.
     
     Args:
         dataset_path: Path to the dataset CSV file.
         use_cv: Whether to perform cross-validation.
+        use_advanced: Whether to train advanced models (LSTM, Autoencoder, Transformer, Stacking).
     """
     print("="*60)
     print("FRAUDSENSE AI - MODEL TRAINING")
     print("="*60)
     print(f"Dataset: {dataset_path}")
     print(f"Cross-Validation: {'Enabled' if use_cv else 'Disabled'}")
+    print(f"Advanced Models: {'Enabled' if use_advanced else 'Disabled'}")
     
     # Preprocess data
     X_train, X_test, y_train, y_test = preprocess_data(dataset_path)
@@ -841,6 +846,54 @@ def train_models(dataset_path: str = DEFAULT_DATASET_PATH, use_cv: bool = True) 
     # Save training statistics for drift detection
     save_training_stats(X_train, TRAINING_STATS_PATH)
     
+    # Train advanced models if enabled
+    if use_advanced:
+        print("\n" + "="*60)
+        print("TRAINING ADVANCED MODELS...")
+        print("="*60)
+        advanced_metrics = train_advanced_models(X_train, y_train, X_test, y_test)
+        
+        print("\n" + "="*60)
+        print("COMBINED MODEL COMPARISON")
+        print("="*60)
+        all_metrics = {**metrics, **advanced_metrics}
+        
+        print(f"{'Model':<25} {'ROC-AUC':<12} {'F1':<12}")
+        print("-"*50)
+        for name, m in all_metrics.items():
+            print(f"{name:<25} {m['roc_auc']:<12.4f} {m['f1']:<12.4f}")
+        
+        best_overall = max(all_metrics, key=lambda x: all_metrics[x]["roc_auc"])
+        print(f"\nBest Overall Model: {best_overall} (ROC-AUC: {all_metrics[best_overall]['roc_auc']:.4f})")
+        
+        print("\n" + "="*60)
+        print("RUNNING MODEL IMPROVEMENTS...")
+        print("="*60)
+        
+        try:
+            improvement_results = run_model_improvements(X_train, y_train, X_test, y_test)
+            
+            print("\nModel Improvement Results:")
+            print("-"*40)
+            
+            if "transfer_learning" in improvement_results:
+                tl_metrics = improvement_results["transfer_learning"]["metrics"]
+                print(f"Transfer Learning ROC-AUC: {tl_metrics['roc_auc']:.4f}")
+            
+            if "bayesian_optimization" in improvement_results:
+                bo_result = improvement_results["bayesian_optimization"]
+                print(f"Bayesian Optimization Best Score: {bo_result.get('best_score', 'N/A'):.4f}")
+            
+            if "cross_domain_validation" in improvement_results:
+                cd_result = improvement_results["cross_domain_validation"]
+                if "summary" in cd_result:
+                    summary = cd_result["summary"]
+                    print(f"Cross-domain Mean ROC-AUC: {summary.get('mean_roc_auc', 'N/A'):.4f}")
+            
+            print("\n✓ Model improvements completed successfully!")
+        except Exception as e:
+            print(f"\nModel improvements skipped: {e}")
+    
     print("\n" + "="*60)
     print("TRAINING COMPLETE!")
     print("="*60)
@@ -851,6 +904,8 @@ def train_models(dataset_path: str = DEFAULT_DATASET_PATH, use_cv: bool = True) 
     print(f"  - Training Stats: {TRAINING_STATS_PATH}")
     print(f"  - Metrics: {METRICS_DIR}/*")
     print(f"  - Global SHAP: {GLOBAL_FEATURE_IMPORTANCE_PATH}")
+    if use_advanced:
+        print(f"  - Advanced Models: advanced_models/*")
 
 
 if __name__ == "__main__":

@@ -3,36 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | FraudSense AI</title>
+    <title>FraudSense AI | Enterprise Fraud Detection</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23f59e0b'/%3E%3Cpath d='M8 16L14 10L20 16L14 22L8 16Z' fill='white'/%3E%3Cpath d='M14 16L20 10L26 16L20 22L14 16Z' fill='white' opacity='0.6'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="app-container">
+    <!-- Welcome Screen -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-content">
+            <div class="welcome-logo">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M4 12L10 6L16 12L10 18L4 12Z" fill="currentColor"/>
+                    <path d="M10 12L16 6L22 12L16 18L10 12Z" fill="currentColor" opacity="0.5"/>
+                </svg>
+            </div>
+            <h1>Welcome to FraudSense AI</h1>
+            <h2>Your Enterprise Fraud Detection Dashboard</h2>
+            <div class="welcome-stats">
+                <div class="welcome-stat">
+                    <div class="welcome-stat-value" id="welcomeModelHealth">99.2%</div>
+                    <div class="welcome-stat-label">Model Accuracy</div>
+                </div>
+                <div class="welcome-stat">
+                    <div class="welcome-stat-value" id="welcomeTransactions">12,847</div>
+                    <div class="welcome-stat-label">Today's Transactions</div>
+                </div>
+                <div class="welcome-stat">
+                    <div class="welcome-stat-value" id="welcomeThreats">99</div>
+                    <div class="welcome-stat-label">Threats Blocked</div>
+                </div>
+            </div>
+            <button class="btn btn-primary welcome-btn" id="welcomeStartBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+                Enter Dashboard
+            </button>
+        </div>
+    </div>
+
+    <div class="app-container has-sidebar" id="appContainer">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M4 12L10 6L16 12L10 18L4 12Z" fill="currentColor"/>
+                            <path d="M10 12L16 6L22 12L16 18L10 12Z" fill="currentColor" opacity="0.5"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">FraudSense</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="sidebar-nav-item active" data-page="dashboard">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    <span>Dashboard</span>
+                    <span class="shortcut-hint">D</span>
+                </a>
+                <a href="analysis.html" class="sidebar-nav-item" data-page="analysis">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3"/>
+                        <path d="M16 3l5 5-5 5"/>
+                    </svg>
+                    <span>Analysis</span>
+                    <span class="shortcut-hint">A</span>
+                </a>
+                <a href="history.html" class="sidebar-nav-item" data-page="history">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>History</span>
+                    <span class="shortcut-hint">H</span>
+                </a>
+                <a href="settings.html" class="sidebar-nav-item" data-page="settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    <span>Settings</span>
+                    <span class="shortcut-hint">S</span>
+                </a>
+                <a href="platform.html" class="sidebar-nav-item" data-page="platform">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                    <span>Platform</span>
+                    <span class="shortcut-hint">P</span>
+                </a>
+                <div class="sidebar-nav-item" id="keyboardShortcutsBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                        <path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001"/>
+                        <path d="M6 12h.001M10 12h.001M14 12h.001M18 12h.001"/>
+                        <path d="M6 16h12"/>
+                    </svg>
+                    <span>Shortcuts</span>
+                    <span class="shortcut-hint">?</span>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="theme-toggle" id="themeToggle">
+                    <span class="theme-toggle-label">
+                        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                        <span>Theme</span>
+                    </span>
+                    <span class="theme-toggle-icon">
+                        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                        </svg>
+                        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+        </aside>
+
         <!-- Header -->
         <header class="header">
             <div class="header-left">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                            <path d="M12 8v4M12 16h.01"/>
-                        </svg>
-                    </div>
-                    <span class="logo-text">FraudSense AI</span>
-                </div>
                 <div class="header-badge">ENTERPRISE</div>
             </div>
-            
-            <!-- Navigation Links -->
-            <nav class="header-nav">
-                <a href="dashboard.html" class="nav-link active">Dashboard</a>
-                <a href="analysis.html" class="nav-link">Analysis</a>
-                <a href="history.html" class="nav-link">History</a>
-                <a href="settings.html" class="nav-link">Settings</a>
-            </nav>
             
             <div class="header-center">
                 <div class="live-indicator">
@@ -57,9 +182,19 @@
         <!-- Main Content -->
         <main class="main-content">
             <!-- Top Stats Row -->
-            <div class="stats-row">
+            <div class="stats-row" id="statsRow">
                 <!-- Model Health Panel -->
-                <div class="card model-health">
+                <div class="card model-health draggable drag-model-health" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
                     <div class="card-header">
                         <h3>Model Health</h3>
                         <div class="status-badge healthy" id="modelStatus">OPERATIONAL</div>
@@ -87,7 +222,17 @@
                 </div>
 
                 <!-- Risk Score Gauge -->
-                <div class="card risk-gauge-card">
+                <div class="card risk-gauge-card draggable drag-risk-gauge" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
                     <div class="card-header">
                         <h3>Final Risk Score</h3>
                     </div>
@@ -116,7 +261,17 @@
                 </div>
 
                 <!-- Live Stats -->
-                <div class="card live-stats">
+                <div class="card live-stats draggable drag-live-stats" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
                     <div class="card-header">
                         <h3>Live Statistics</h3>
                         <div class="pulse-dot"></div>
@@ -142,7 +297,17 @@
                 </div>
 
                 <!-- Latency Indicator -->
-                <div class="card latency-card">
+                <div class="card latency-card draggable drag-latency" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
                     <div class="card-header">
                         <h3>Inference Latency</h3>
                     </div>
@@ -162,9 +327,82 @@
                 </div>
             </div>
 
-            <!-- Bottom Stats -->
-            <div class="bottom-stats">
-                <div class="card risk-distribution">
+            <!-- Bottom Stats Row 1 -->
+            <div class="bottom-stats" id="bottomStats">
+                <!-- Fraud Pattern 3D Visualization -->
+                <div class="card fraud-3d-card draggable drag-fraud-3d" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
+                    <div class="card-header">
+                        <h3>Fraud Patterns</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="fraud-3d-container" id="fraud3DContainer"></div>
+                    </div>
+                </div>
+
+                <!-- Real-time Fraud Rate Chart -->
+                <div class="card fraud-chart-card draggable drag-fraud-chart" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
+                    <div class="card-header">
+                        <h3>Fraud Rate Trend</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="realtime-chart" id="fraudChartContainer"></div>
+                    </div>
+                </div>
+
+                <!-- Real-time Transaction Volume Chart -->
+                <div class="card transactions-chart-card draggable drag-transactions-chart" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
+                    <div class="card-header">
+                        <h3>Transaction Volume</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="realtime-chart" id="transactionsChartContainer"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Stats Row 2 -->
+            <div class="bottom-stats" id="bottomStats2">
+                <div class="card risk-distribution draggable drag-risk-distribution" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
                     <div class="card-header">
                         <h3>Risk Distribution</h3>
                     </div>
@@ -194,60 +432,128 @@
                     </div>
                 </div>
 
-                <div class="card action-distribution">
+                <!-- Campaign ROI Analysis -->
+                <div class="card campaign-roi-card draggable drag-campaign-roi" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
                     <div class="card-header">
-                        <h3>Action Distribution</h3>
+                        <h3>Campaign ROI</h3>
+                        <select id="campaignSelect" class="campaign-dropdown">
+                            <option value="all">All Campaigns</option>
+                            <option value="q1">Q1 2024</option>
+                            <option value="q2">Q2 2024</option>
+                            <option value="q3">Q3 2024</option>
+                            <option value="q4">Q4 2024</option>
+                        </select>
                     </div>
                     <div class="card-body">
-                        <div class="action-stats">
-                            <div class="action-stat">
-                                <span class="action-stat-icon block">⛔</span>
-                                <div class="action-stat-info">
-                                    <span class="action-stat-value" id="blockedCount">0</span>
-                                    <span class="action-stat-label">Blocked</span>
-                                </div>
+                        <div class="roi-summary">
+                            <div class="roi-metric">
+                                <span class="roi-label">Total Prevented</span>
+                                <span class="roi-value success" id="roiPrevented">$0</span>
                             </div>
-                            <div class="action-stat">
-                                <span class="action-stat-icon review">👁️</span>
-                                <div class="action-stat-info">
-                                    <span class="action-stat-value" id="reviewCount">0</span>
-                                    <span class="action-stat-label">Review</span>
-                                </div>
+                            <div class="roi-metric">
+                                <span class="roi-label">Cost Savings</span>
+                                <span class="roi-value" id="roiSavings">$0</span>
                             </div>
-                            <div class="action-stat">
-                                <span class="action-stat-icon approve">✓</span>
-                                <div class="action-stat-info">
-                                    <span class="action-stat-value" id="approvedCount">0</span>
-                                    <span class="action-stat-label">Approved</span>
-                                </div>
+                            <div class="roi-metric">
+                                <span class="roi-label">ROI</span>
+                                <span class="roi-value highlight" id="roiPercent">0%</span>
                             </div>
+                        </div>
+                        <div class="roi-chart-container">
+                            <canvas id="roiChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Stats Row 3 -->
+            <div class="bottom-stats" id="bottomStats3">
+                <!-- Anomaly Visualization -->
+                <div class="card anomaly-viz-card draggable drag-anomaly-viz" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
+                    <div class="card-header">
+                        <h3>Anomaly Explorer</h3>
+                        <div class="anomaly-controls">
+                            <button class="anomaly-filter-btn active" data-filter="all">All</button>
+                            <button class="anomaly-filter-btn" data-filter="high">High Risk</button>
+                            <button class="anomaly-filter-btn" data-filter="medium">Medium</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="anomaly-scatter-container">
+                            <canvas id="anomalyScatterChart"></canvas>
+                        </div>
+                        <div class="anomaly-legend">
+                            <span class="legend-item"><span class="legend-dot high"></span> High Risk</span>
+                            <span class="legend-item"><span class="legend-dot medium"></span> Medium</span>
+                            <span class="legend-item"><span class="legend-dot low"></span> Low Risk</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="card stress-test-card">
+                <!-- Trend Analysis -->
+                <div class="card trend-analysis-card draggable drag-trend-analysis" draggable="true">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="5" r="1"/>
+                            <circle cx="9" cy="12" r="1"/>
+                            <circle cx="9" cy="19" r="1"/>
+                            <circle cx="15" cy="5" r="1"/>
+                            <circle cx="15" cy="12" r="1"/>
+                            <circle cx="15" cy="19" r="1"/>
+                        </svg>
+                    </div>
                     <div class="card-header">
-                        <h3>Stress Test</h3>
+                        <h3>Trend Analysis</h3>
+                        <div class="trend-controls">
+                            <select id="trendPeriodSelect" class="trend-dropdown">
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                                <option value="90d">Last 90 Days</option>
+                                <option value="1y">Last Year</option>
+                            </select>
+                            <select id="trendTypeSelect" class="trend-dropdown">
+                                <option value="fraud">Fraud Rate</option>
+                                <option value="volume">Transaction Volume</option>
+                                <option value="risk">Risk Score</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <button class="btn btn-stress" id="stressTestBtn">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                            </svg>
-                            Run 1000 Transactions
-                        </button>
-                        <div class="stress-results" id="stressResults" style="display: none;">
-                            <div class="stress-stat">
-                                <span>Processed</span>
-                                <b id="stressProcessed">0</b>
+                        <div class="trend-chart-container">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                        <div class="trend-forecast">
+                            <div class="forecast-item">
+                                <span class="forecast-label">Seasonal Pattern</span>
+                                <span class="forecast-value" id="seasonalPattern">--</span>
                             </div>
-                            <div class="stress-stat">
-                                <span>Avg Time</span>
-                                <b id="stressAvgTime">0ms</b>
+                            <div class="forecast-item">
+                                <span class="forecast-label">Long-term Trend</span>
+                                <span class="forecast-value" id="longTermTrend">--</span>
                             </div>
-                            <div class="stress-stat">
-                                <span>Throughput</span>
-                                <b id="stressTps">0 TPS</b>
+                            <div class="forecast-item">
+                                <span class="forecast-label">Predicted Next Week</span>
+                                <span class="forecast-value" id="predictedFraud">--</span>
                             </div>
                         </div>
                     </div>
@@ -264,12 +570,162 @@
             loadDashboardData();
             startAnalyticsPolling();
             
-            // Stress test
-            const stressBtn = document.getElementById('stressTestBtn');
-            if (stressBtn) {
-                stressBtn.addEventListener('click', runStressTest);
-            }
+            // New features initialization
+            initWelcomeScreen();
+            initSidebar();
+            initKeyboardShortcuts();
+            initDragAndDrop();
+            initInteractiveFeatures();
         });
+
+        // Welcome Screen
+        function initWelcomeScreen() {
+            const welcomeOverlay = document.getElementById('welcomeOverlay');
+            const welcomeStartBtn = document.getElementById('welcomeStartBtn');
+            const appContainer = document.getElementById('appContainer');
+            
+            // Check if user has visited before
+            const hasVisited = localStorage.getItem('fraudsense_visited');
+            
+            if (hasVisited) {
+                welcomeOverlay.classList.add('hidden');
+            } else {
+                // Update welcome stats with live data
+                updateWelcomeStats();
+            }
+            
+            welcomeStartBtn.addEventListener('click', () => {
+                welcomeOverlay.classList.add('hidden');
+                localStorage.setItem('fraudsense_visited', 'true');
+            });
+        }
+
+        function updateWelcomeStats() {
+            // Use default values, will be updated after data loads
+            const modelHealth = document.getElementById('welcomeModelHealth');
+            const transactions = document.getElementById('welcomeTransactions');
+            const threats = document.getElementById('welcomeThreats');
+            
+            // Update after dashboard data loads
+            setTimeout(() => {
+                const rocAuc = document.getElementById('rocAuc');
+                const totalTrans = document.getElementById('totalTransactions');
+                const blocked = document.getElementById('blockedCount');
+                
+                if (rocAuc) modelHealth.textContent = (parseFloat(rocAuc.textContent) * 100).toFixed(1) + '%';
+                if (totalTrans) transactions.textContent = parseInt(totalTrans.textContent).toLocaleString();
+                if (blocked) threats.textContent = blocked.textContent;
+            }, 1000);
+        }
+
+        function initDragAndDrop() {
+            const statsRow = document.getElementById('statsRow');
+            const bottomStats = document.getElementById('bottomStats');
+            const bottomStats2 = document.getElementById('bottomStats2');
+            const bottomStats3 = document.getElementById('bottomStats3');
+            let draggedItem = null;
+
+            const topCards = statsRow.querySelectorAll('.draggable');
+            topCards.forEach(card => {
+                enableDrag(card);
+            });
+
+            const bottomCards = bottomStats.querySelectorAll('.draggable');
+            bottomCards.forEach(card => {
+                enableDrag(card);
+            });
+
+            if (bottomStats2) {
+                const bottomCards2 = bottomStats2.querySelectorAll('.draggable');
+                bottomCards2.forEach(card => {
+                    enableDrag(card);
+                });
+            }
+
+            if (bottomStats3) {
+                const bottomCards3 = bottomStats3.querySelectorAll('.draggable');
+                bottomCards3.forEach(card => {
+                    enableDrag(card);
+                });
+            }
+
+            function enableDrag(card) {
+                card.addEventListener('dragstart', (e) => {
+                    draggedItem = card;
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    draggedItem = null;
+                });
+
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                });
+
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    if (draggedItem && draggedItem !== card) {
+                        const container = card.parentNode;
+                        const allCards = Array.from(container.querySelectorAll('.draggable'));
+                        const draggedIndex = allCards.indexOf(draggedItem);
+                        const dropIndex = allCards.indexOf(card);
+
+                        if (draggedIndex < dropIndex) {
+                            card.parentNode.insertBefore(draggedItem, card.nextSibling);
+                        } else {
+                            card.parentNode.insertBefore(draggedItem, card);
+                        }
+                        
+                        saveWidgetLayout();
+                    }
+                });
+            }
+        }
+
+        function saveWidgetLayout() {
+            const topOrder = Array.from(document.querySelectorAll('#statsRow .draggable')).map(el => {
+                return Array.from(el.classList).find(c => c.startsWith('drag-'));
+            });
+            const bottomOrder = Array.from(document.querySelectorAll('#bottomStats .draggable')).map(el => {
+                return Array.from(el.classList).find(c => c.startsWith('drag-'));
+            });
+            
+            localStorage.setItem('fraudsense_widget_layout', JSON.stringify({
+                top: topOrder,
+                bottom: bottomOrder
+            }));
+        }
+
+        function loadWidgetLayout() {
+            const layout = JSON.parse(localStorage.getItem('fraudsense_widget_layout') || '{}');
+            
+            if (layout.top) {
+                const container = document.getElementById('statsRow');
+                layout.top.forEach(className => {
+                    const card = container.querySelector('.' + className);
+                    if (card) container.appendChild(card);
+                });
+            }
+            
+            if (layout.bottom) {
+                const container = document.getElementById('bottomStats');
+                layout.bottom.forEach(className => {
+                    const card = container.querySelector('.' + className);
+                    if (card) container.appendChild(card);
+                });
+            }
+        }
+
+        </script>
+    </body>
+</html>
+
+        // Load saved layout
+        loadWidgetLayout();
     </script>
 </body>
 </html>

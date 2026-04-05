@@ -6,7 +6,7 @@ with enterprise-grade features including audit logging, model versioning,
 decision recommendations, and ensemble risk scoring.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -21,6 +21,7 @@ import time
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import threading
+from datetime import datetime, timedelta
 
 # Add current directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -51,6 +52,36 @@ from RiskPlatform import (
     UserRole,
     Permission
 )
+
+# Import new platform modules
+from multi_channel import (
+    get_multi_channel_detector,
+    create_transaction_from_features,
+    PaymentChannel,
+    MobileWallet,
+    CryptoCurrency,
+    WireTransferType
+)
+
+from behavioral_biometrics import (
+    get_biometrics_engine,
+    analyze_biometric_data
+)
+
+from graph_neural_networks import (
+    get_gnn_detector,
+    analyze_fraud_graph
+)
+
+from federated_learning import (
+    get_federated_coordinator
+)
+
+# Import new explainability and compliance modules
+from RiskPlatform.counterfactual_explainer import get_counterfactual_explainer
+from RiskPlatform.compliance_reporter import get_compliance_reporter, DataSubjectRequestType
+from RiskPlatform.adversarial_robustness import get_adversarial_detector, get_robustness_tester
+from RiskPlatform.fairness_monitor import get_fairness_monitor, ProtectedAttribute
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -106,6 +137,26 @@ class TransactionFeatures(BaseModel):
     # Time and Amount
     Time: Optional[float] = 0.0
     Amount: Optional[float] = 0.0
+    
+    # Multi-channel support
+    payment_channel: Optional[str] = "card"
+    mobile_wallet: Optional[str] = None
+    device_id: Optional[str] = None
+    device_os: Optional[str] = None
+    crypto_currency: Optional[str] = None
+    wallet_address: Optional[str] = None
+    blockchain_confirmations: Optional[int] = None
+    wire_type: Optional[str] = None
+    sender_bank: Optional[str] = None
+    sender_country: Optional[str] = None
+    recipient_country: Optional[str] = None
+    
+    # Behavioral biometrics
+    user_id: Optional[str] = None
+    keystroke_data: Optional[Dict[str, Any]] = None
+    mouse_data: Optional[Dict[str, Any]] = None
+    device_fingerprint: Optional[Dict[str, Any]] = None
+    session_data: Optional[Dict[str, Any]] = None
     
     class Config:
         schema_extra = {
@@ -337,21 +388,9 @@ async def startup_event():
 
 
 @app.get("/")
-async def root():
-    """Root endpoint."""
-    return {
-        "name": "FraudSense AI API",
-        "version": "2.0.0",
-        "description": "Enterprise-grade fraud detection system",
-        "endpoints": {
-            "predict": "/predict (POST)",
-            "simulate": "/simulate (GET)",
-            "analytics": "/analytics (GET)",
-            "audit_log": "/audit-log (GET)",
-            "model_info": "/model-info (GET)",
-            "stress_test": "/stress-test (GET)"
-        }
-    }
+async def serve_index():
+    """Serve the frontend index page."""
+    return FileResponse(os.path.join(frontend_path, 'index.html'))
 
 
 @app.get("/health")
@@ -1111,6 +1150,275 @@ async def explain_transaction(transaction_id: str):
 
 
 # ============================================================================
+# COUNTERFACTUAL EXPLANATIONS ENDPOINTS
+# ============================================================================
+
+class CounterfactualResponse(BaseModel):
+    transaction_id: str
+    original_probability: float
+    target_probability: float
+    changes: List[Dict[str, Any]]
+    sparsity: float
+    num_changes: int
+    feasibility: str
+    summary: str
+
+
+@app.post("/counterfactual/{transaction_id}", response_model=CounterfactualResponse)
+async def get_counterfactual(
+    transaction_id: str,
+    features: TransactionFeatures,
+    target_probability: float = 0.3
+):
+    """
+    Generate counterfactual explanation for a transaction.
+    
+    Shows what minimal changes would flip a false positive to genuine.
+    """
+    counterfactual_explainer = get_counterfactual_explainer()
+    
+    features_dict = features.model_dump()
+    fraud_prob = 0.7
+    
+    cf = counterfactual_explainer.generate_counterfactual(
+        transaction_id=transaction_id,
+        features=features_dict,
+        fraud_probability=fraud_prob,
+        target_probability=target_probability
+    )
+    
+    return CounterfactualResponse(**cf)
+
+
+# ============================================================================
+# COMPLIANCE REPORTING ENDPOINTS
+# ============================================================================
+
+class GDPRReportResponse(BaseModel):
+    report_id: str
+    generated_at: str
+    report_period: Dict[str, str]
+    standard: str
+    compliance_status: str
+    compliance_score: float
+    sections: Dict[str, Any]
+
+
+@app.get("/compliance/gdpr-report", response_model=GDPRReportResponse)
+async def get_gdpr_report(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+):
+    """
+    Generate GDPR compliance report.
+    
+    Returns compliance status for:
+    - Right to explanation (Article 22)
+    - Data minimization
+    - Retention policies
+    """
+    reporter = get_compliance_reporter()
+    report = reporter.generate_gdpr_report(start_date, end_date)
+    return GDPRReportResponse(**report)
+
+
+class PCIDSSReportResponse(BaseModel):
+    report_id: str
+    generated_at: str
+    report_period: Dict[str, str]
+    standard: str
+    compliance_status: str
+    compliance_score: float
+    sections: Dict[str, Any]
+
+
+@app.get("/compliance/pci-dss-report", response_model=PCIDSSReportResponse)
+async def get_pci_dss_report(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+):
+    """
+    Generate PCI-DSS compliance report.
+    
+    Returns compliance status for:
+    - Requirement 10: Logging
+    - Requirement 11: Testing
+    - Requirement 12: Policies
+    """
+    reporter = get_compliance_reporter()
+    report = reporter.generate_pci_dss_report(start_date, end_date)
+    return PCIDSSReportResponse(**report)
+
+
+@app.get("/compliance/combined-report")
+async def get_combined_report(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None
+):
+    """Generate combined GDPR and PCI-DSS compliance report."""
+    reporter = get_compliance_reporter()
+    return reporter.generate_combined_report(start_date, end_date)
+
+
+class DataSubjectRequestResponse(BaseModel):
+    request_id: str
+    status: str
+    requester_id: str
+    data_provided: Optional[Dict[str, str]] = None
+    erased_transactions: Optional[List[str]] = None
+    download_link: Optional[str] = None
+
+
+@app.post("/compliance/data-subject-request", response_model=DataSubjectRequestResponse)
+async def process_data_subject_request(
+    request_type: str,
+    requester_id: str,
+    transaction_ids: Optional[List[str]] = None
+):
+    """
+    Process GDPR data subject requests.
+    
+    Request types:
+    - access: Right to access (Article 15)
+    - erasure: Right to erasure (Article 17)
+    - portability: Right to data portability (Article 20)
+    """
+    reporter = get_compliance_reporter()
+    
+    request_type_enum = DataSubjectRequestType(request_type)
+    
+    result = reporter.process_data_subject_request(
+        request_type=request_type_enum,
+        requester_id=requester_id,
+        transaction_ids=transaction_ids
+    )
+    
+    return DataSubjectRequestResponse(**result)
+
+
+# ============================================================================
+# ADVERSARIAL ROBUSTNESS ENDPOINTS
+# ============================================================================
+
+class AdversarialAnalysisResponse(BaseModel):
+    transaction_id: str
+    timestamp: str
+    is_adversarial: bool
+    adversarial_score: float
+    flags: List[str]
+    defense_action: str
+
+
+@app.post("/adversarial/analyze", response_model=AdversarialAnalysisResponse)
+async def analyze_adversarial(features: TransactionFeatures):
+    """
+    Analyze transaction for adversarial characteristics.
+    
+    Detects potential adversarial attacks on the model.
+    """
+    detector = get_adversarial_detector()
+    
+    features_dict = features.model_dump()
+    transaction_id = f"ADV-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+    
+    result = detector.analyze_input(features_dict, transaction_id)
+    
+    return AdversarialAnalysisResponse(
+        transaction_id=result["transaction_id"],
+        timestamp=result["timestamp"],
+        is_adversarial=result["is_adversarial"],
+        adversarial_score=result["adversarial_score"],
+        flags=result["flags"],
+        defense_action=result["defense_action"]
+    )
+
+
+@app.get("/adversarial/statistics")
+async def get_adversarial_statistics():
+    """Get adversarial detection statistics."""
+    detector = get_adversarial_detector()
+    return detector.get_detection_statistics()
+
+
+@app.post("/adversarial/preprocess")
+async def preprocess_adversarial(features: TransactionFeatures, apply_defense: bool = True):
+    """Apply adversarial defense preprocessing to features."""
+    detector = get_adversarial_detector()
+    features_dict = features.model_dump()
+    defended = detector.preprocess_input(features_dict, apply_defense)
+    return {"defended_features": defended}
+
+
+# ============================================================================
+# FAIRNESS MONITORING ENDPOINTS
+# ============================================================================
+
+class FairnessMetricsResponse(BaseModel):
+    protected_attribute: str
+    groups: Dict[str, Any]
+    overall_metrics: Dict[str, Any]
+    bias_detected: bool
+    recommendations: List[str]
+    disparate_impact: Dict[str, Any]
+    demographic_parity: Dict[str, Any]
+    equalized_odds: Dict[str, Any]
+
+
+@app.get("/fairness/metrics", response_model=FairnessMetricsResponse)
+async def get_fairness_metrics(attribute: str = "amount_tier"):
+    """
+    Calculate fairness metrics for a protected attribute.
+    
+    Attributes: amount_tier, time_of_day, transaction_frequency
+    """
+    monitor = get_fairness_monitor()
+    protected_attr = ProtectedAttribute(attribute)
+    metrics = monitor.calculate_fairness_metrics(protected_attr)
+    return FairnessMetricsResponse(**metrics)
+
+
+@app.get("/fairness/alerts")
+async def get_fairness_alerts():
+    """Get recent fairness alerts."""
+    monitor = get_fairness_monitor()
+    return {"alerts": monitor.get_fairness_alerts()}
+
+
+@app.get("/fairness/trends")
+async def get_fairness_trends(days: int = 30):
+    """Get fairness trends over time."""
+    monitor = get_fairness_monitor()
+    return monitor.get_fairness_trends(days)
+
+
+@app.post("/fairness/record")
+async def record_fairness_data(
+    transaction_id: str,
+    features: TransactionFeatures,
+    prediction: int,
+    actual_label: Optional[int] = None,
+    fraud_probability: float = 0.0
+):
+    """
+    Record prediction for fairness monitoring.
+    
+    Call this for each transaction to build fairness statistics.
+    """
+    monitor = get_fairness_monitor()
+    features_dict = features.model_dump()
+    
+    monitor.record_prediction(
+        transaction_id=transaction_id,
+        features=features_dict,
+        prediction=prediction,
+        actual_label=actual_label,
+        fraud_probability=fraud_probability
+    )
+    
+    return {"status": "recorded"}
+
+
+# ============================================================================
 # RISK INTELLIGENCE DASHBOARD ENDPOINTS
 # ============================================================================
 
@@ -1251,19 +1559,168 @@ async def get_system_logs_stats():
 # AUTH & API KEY ENDPOINTS
 # ============================================================================
 
-@app.get("/api-keys")
-async def list_api_keys():
-    """List all API keys (admin only)."""
-    api_key_manager = get_api_key_manager()
-    return {"api_keys": api_key_manager.list_keys()}
+# @app.get("/api-keys")
+# async def list_api_keys():
+#     """List all API keys (admin only)."""
+#     api_key_manager = get_api_key_manager()
+#     return {"api_keys": api_key_manager.list_keys()}
+
+
+# ============================================================================
+# PLATFORM FEATURES ENDPOINTS
+# ============================================================================
+
+@app.get("/platform/multi-channel/config")
+async def get_multi_channel_config():
+    """Get multi-channel fraud detection configuration."""
+    detector = get_multi_channel_detector()
+    return detector.get_channel_risk_config()
+
+
+@app.post("/platform/multi-channel/analyze")
+async def analyze_multi_channel(features: TransactionFeatures):
+    """Analyze transaction with multi-channel fraud detection."""
+    detector = get_multi_channel_detector()
+    
+    # Create transaction from features
+    transaction = create_transaction_from_features(features.dict())
+    
+    # Analyze
+    result = detector.analyze_transaction(transaction)
+    
+    return {
+        "channel": transaction.channel.value,
+        **result
+    }
+
+
+@app.get("/platform/biometrics/config")
+async def get_biometrics_config():
+    """Get behavioral biometrics configuration."""
+    engine = get_biometrics_engine()
+    return engine.get_config()
+
+
+@app.post("/platform/biometrics/analyze")
+async def analyze_biometrics(
+    user_id: str,
+    keystroke: Optional[Dict[str, Any]] = None,
+    mouse: Optional[Dict[str, Any]] = None,
+    device: Optional[Dict[str, Any]] = None,
+    session: Optional[Dict[str, Any]] = None
+):
+    """Analyze behavioral biometrics data."""
+    engine = get_biometrics_engine()
+    
+    biometric_data = {
+        "user_id": user_id,
+        "keystroke": keystroke,
+        "mouse": mouse,
+        "device": device,
+        "session": session
+    }
+    
+    result = engine.analyze_behavior(biometric_data)
+    
+    return result
+
+
+@app.get("/platform/graph/config")
+async def get_gnn_config():
+    """Get graph neural network configuration."""
+    detector = get_gnn_detector()
+    return detector.get_config()
+
+
+@app.post("/platform/graph/analyze")
+async def analyze_graph(
+    transactions: List[Dict[str, Any]],
+    user_transactions: Dict[str, List[str]],
+    suspicious_threshold: float = 0.5
+):
+    """Analyze transaction graph for fraud rings."""
+    detector = get_gnn_detector()
+    result = detector.analyze_graph(transactions, user_transactions, suspicious_threshold)
+    return result
+
+
+@app.get("/platform/federated/config")
+async def get_federated_config():
+    """Get federated learning configuration."""
+    coordinator = get_federated_coordinator()
+    return {
+        "privacy_settings": {
+            "epsilon": coordinator.dp.epsilon,
+            "delta": coordinator.dp.delta,
+            "max_grad_norm": coordinator.dp.max_grad_norm
+        },
+        "compression": {
+            "scheme": coordinator.compressor.compression_scheme,
+            "ratio": coordinator.compressor.compression_ratio
+        }
+    }
+
+
+@app.get("/platform/federated/stats")
+async def get_federated_stats():
+    """Get federated learning statistics."""
+    coordinator = get_federated_coordinator()
+    return coordinator.get_institution_stats()
+
+
+@app.get("/platform/federated/privacy-report")
+async def get_privacy_report():
+    """Get privacy budget report."""
+    coordinator = get_federated_coordinator()
+    return coordinator.get_privacy_report()
+
+
+@app.post("/platform/federated/register")
+async def register_institution(
+    institution_id: str,
+    name: str,
+    data_size: int
+):
+    """Register a new institution in federated learning."""
+    coordinator = get_federated_coordinator()
+    institution = coordinator.register_institution(institution_id, name, data_size)
+    return {
+        "institution_id": institution.institution_id,
+        "name": institution.name,
+        "data_size": institution.data_size,
+        "status": "registered"
+    }
+
+
+@app.get("/platform/features")
+async def get_platform_features():
+    """Get available platform features."""
+    return {
+        "multi_channel_support": {
+            "enabled": True,
+            "channels": ["card", "mobile", "crypto", "wire"],
+            "description": "Fraud detection for multiple payment channels"
+        },
+        "behavioral_biometrics": {
+            "enabled": True,
+            "features": ["keystroke", "mouse", "device_fingerprint", "session"],
+            "description": "User behavior analytics and device fingerprinting"
+        },
+        "graph_neural_networks": {
+            "enabled": True,
+            "features": ["fraud_ring_detection", "graph_embedding", "community_detection"],
+            "description": "Detect fraud rings and coordinated activities"
+        },
+        "federated_learning": {
+            "enabled": True,
+            "features": ["secure_aggregation", "differential_privacy", "cross_institution"],
+            "description": "Privacy-preserving training across institutions"
+        }
+    }
 
 
 # Serve frontend static files
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend')
-
-@app.get("/")
-async def serve_index():
-    return FileResponse(os.path.join(frontend_path, 'index.html'))
 
 @app.get("/dashboard")
 async def serve_dashboard():
@@ -1280,6 +1737,10 @@ async def serve_history():
 @app.get("/settings")
 async def serve_settings():
     return FileResponse(os.path.join(frontend_path, 'settings.html'))
+
+@app.get("/platform")
+async def serve_platform():
+    return FileResponse(os.path.join(frontend_path, 'platform.html'))
 
 # Serve HTML pages with .html extension
 @app.get("/index.html")
@@ -1301,6 +1762,226 @@ async def serve_history_html():
 @app.get("/settings.html")
 async def serve_settings_html():
     return FileResponse(os.path.join(frontend_path, 'settings.html'))
+
+@app.get("/platform.html")
+async def serve_platform_html():
+    return FileResponse(os.path.join(frontend_path, 'platform.html'))
+
+
+# ============================================================================
+# ANALYTICS & VISUALIZATION ENDPOINTS
+# ============================================================================
+
+class TrendAnalysisResponse(BaseModel):
+    """Model for trend analysis response."""
+    
+    period: str = Field(..., description="Time period")
+    data_type: str = Field(..., description="Type of data")
+    labels: List[str] = Field(..., description="Time labels")
+    actual_values: List[float] = Field(..., description="Actual values")
+    trend_values: List[float] = Field(..., description="Trend line values")
+    forecast_values: List[float] = Field(..., description="Forecast values")
+    seasonal_pattern: str = Field(..., description="Detected seasonal pattern")
+    long_term_trend: str = Field(..., description="Long term trend direction")
+    predicted_next_week: float = Field(..., description="Predicted value for next week")
+
+
+class AnomalyDataResponse(BaseModel):
+    """Model for anomaly visualization data."""
+    
+    total_anomalies: int = Field(..., description="Total anomaly count")
+    high_risk_count: int = Field(..., description="High risk anomalies")
+    medium_risk_count: int = Field(..., description="Medium risk anomalies")
+    low_risk_count: int = Field(..., description="Low risk anomalies")
+    scatter_data: Dict[str, List[Dict[str, float]]] = Field(..., description="Scatter plot data")
+
+
+class CampaignROIResponse(BaseModel):
+    """Model for Campaign ROI response."""
+    
+    campaign: str = Field(..., description="Campaign identifier")
+    total_prevented: float = Field(..., description="Total fraud prevented")
+    cost_savings: float = Field(..., description="Cost savings")
+    roi_percentage: float = Field(..., description="ROI percentage")
+    monthly_data: List[Dict[str, Any]] = Field(..., description="Monthly breakdown")
+
+
+@app.get("/analytics/trends", response_model=TrendAnalysisResponse)
+async def get_trend_analysis(
+    period: str = Query("7d", description="Time period: 7d, 30d, 90d, 1y"),
+    data_type: str = Query("fraud", description="Data type: fraud, volume, risk")
+):
+    """
+    Get trend analysis with forecasting.
+    
+    Returns time-series data with trend line and 7-day forecast.
+    """
+    period_days = {"7d": 7, "30d": 30, "90d": 90, "1y": 365}.get(period, 7)
+    
+    # Generate labels
+    labels = []
+    now = datetime.now()
+    for i in range(period_days):
+        date = now - timedelta(days=period_days - i - 1)
+        labels.append(date.strftime("%b %d"))
+    
+    # Generate sample data
+    np.random.seed(42)
+    base_values = {
+        "fraud": 1.5,
+        "volume": 500,
+        "risk": 0.35
+    }
+    base = base_values.get(data_type, 1.5)
+    variance = base * 0.5
+    
+    actual_values = []
+    trend_values = []
+    prev_value = base
+    
+    for i in range(period_days):
+        noise = np.random.normal(0, variance * 0.3)
+        seasonal = np.sin(i / 7 * np.pi) * (variance * 0.2)
+        value = max(0, base + noise + seasonal)
+        actual_values.append(round(value, 3))
+        
+        # Simple moving average as trend
+        window = min(7, i + 1)
+        trend = sum(actual_values[max(0, i - window + 1):i + 1]) / window
+        trend_values.append(round(trend, 3))
+        prev_value = trend
+    
+    # Forecast next 7 days
+    last_trend = trend_values[-1] if trend_values else base
+    forecast_values = []
+    for i in range(7):
+        forecast_noise = np.random.normal(0, variance * 0.2)
+        forecast_values.append(round(max(0, last_trend + forecast_noise), 3))
+    
+    # Determine patterns
+    seasonal_patterns = ["Weekly Peak", "Monthly Spike", "Seasonal Variation", "Irregular"]
+    long_term_trends = ["Increasing ↑", "Decreasing ↓", "Stable →", "Volatile ~"]
+    
+    seasonal_pattern = seasonal_patterns[int(np.random.randint(0, len(seasonal_patterns)))]
+    long_term_trend = long_term_trends[int(np.random.randint(0, len(long_term_trends)))]
+    
+    predicted_next = forecast_values[0] if forecast_values else base
+    
+    return TrendAnalysisResponse(
+        period=period,
+        data_type=data_type,
+        labels=labels,
+        actual_values=actual_values,
+        trend_values=trend_values,
+        forecast_values=forecast_values,
+        seasonal_pattern=seasonal_pattern,
+        long_term_trend=long_term_trend,
+        predicted_next_week=round(predicted_next, 3)
+    )
+
+
+@app.get("/analytics/anomalies", response_model=AnomalyDataResponse)
+async def get_anomaly_data(
+    filter: str = Query("all", description="Filter: all, high, medium, low")
+):
+    """
+    Get anomaly visualization data for scatter chart.
+    
+    Returns transaction anomaly scores and fraud probabilities.
+    """
+    # Generate sample anomaly data
+    np.random.seed(42)
+    count = 150
+    
+    high_risk = []
+    medium_risk = []
+    low_risk = []
+    
+    for _ in range(count):
+        probability = np.random.uniform(0, 1)
+        anomaly_score = probability + np.random.uniform(-0.15, 0.15)
+        anomaly_score = max(0, min(1, anomaly_score))
+        
+        point = {
+            "x": round(probability, 3),
+            "y": round(anomaly_score, 3),
+            "probability": round(probability, 3),
+            "anomalyScore": round(anomaly_score, 3),
+            "transactionId": f"TXN-{np.random.randint(100000, 999999)}"
+        }
+        
+        if probability > 0.6 or anomaly_score > 0.7:
+            high_risk.append(point)
+        elif probability > 0.3 or anomaly_score > 0.4:
+            medium_risk.append(point)
+        else:
+            low_risk.append(point)
+    
+    scatter_data = {
+        "high": high_risk[:30] if filter in ["all", "high"] else [],
+        "medium": medium_risk[:40] if filter in ["all", "medium"] else [],
+        "low": low_risk[:80] if filter in ["all", "low"] else []
+    }
+    
+    return AnomalyDataResponse(
+        total_anomalies=len(high_risk) + len(medium_risk) + len(low_risk),
+        high_risk_count=len(high_risk),
+        medium_risk_count=len(medium_risk),
+        low_risk_count=len(low_risk),
+        scatter_data=scatter_data
+    )
+
+
+@app.get("/analytics/campaign-roi", response_model=CampaignROIResponse)
+async def get_campaign_roi(
+    campaign: str = Query("all", description="Campaign: all, q1, q2, q3, q4")
+):
+    """
+    Get Campaign ROI analysis.
+    
+    Returns fraud prevention effectiveness metrics.
+    """
+    # Generate sample ROI data
+    np.random.seed(42)
+    
+    campaign_multipliers = {
+        "all": 1.0,
+        "q1": 0.85,
+        "q2": 0.9,
+        "q3": 0.95,
+        "q4": 1.1
+    }
+    
+    mult = campaign_multipliers.get(campaign, 1.0)
+    
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    monthly_data = []
+    
+    total_prevented = 0
+    total_cost = 0
+    
+    for month in months:
+        prevented = np.random.randint(50000, 150000) * mult
+        cost_incurred = np.random.randint(10000, 30000) * mult
+        
+        monthly_data.append({
+            "month": month,
+            "fraud_prevented": prevented,
+            "cost_incurred": cost_incurred
+        })
+        
+        total_prevented += prevented
+        total_cost += cost_incurred
+    
+    roi_percentage = ((total_prevented - total_cost) / total_cost * 100) if total_cost > 0 else 0
+    
+    return CampaignROIResponse(
+        campaign=campaign,
+        total_prevented=total_prevented,
+        cost_savings=total_cost,
+        roi_percentage=round(roi_percentage, 2),
+        monthly_data=monthly_data
+    )
 
 # Serve JavaScript and CSS files directly
 @app.get("/script.js")

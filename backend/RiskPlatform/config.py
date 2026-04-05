@@ -142,3 +142,18 @@ class AnalyticsConfig:
     
     # Feature importance update frequency
     FEATURE_UPDATE_FREQ: int = 100
+
+
+# ============================================================================
+# COMPLIANCE CONFIGURATION
+# ============================================================================
+
+class ComplianceConfig:
+    """Configuration for Compliance Reporting."""
+    
+    # Data retention days
+    DATA_RETENTION_DAYS: int = 90
+    
+    # Compliance reports directory
+    COMPLIANCE_REPORTS_PATH = os.path.join(LOGS_DIR, "compliance_reports")
+    os.makedirs(COMPLIANCE_REPORTS_PATH, exist_ok=True)

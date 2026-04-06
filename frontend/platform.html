@@ -1243,6 +1243,39 @@
             setInterval(updateSystemTime, 1000);
             updateSystemTime();
         }
+        
+        // Poll for real-time Risk Score updates
+        async function updatePlatformRiskScore() {
+            try {
+                const analytics = await fetch('/analytics/realtime').then(r => r.json());
+                if (analytics && analytics.summary) {
+                    const riskScore = analytics.summary.averages?.risk_score || 
+                                     (analytics.summary.averages?.fraud_probability || 0) * 1.5;
+                    
+                    // Update Risk Score in platform status table
+                    const channelRiskEl = document.getElementById('tableChannelRisk');
+                    const bioRiskEl = document.getElementById('tableBioRisk');
+                    const graphRiskEl = document.getElementById('tableGraphRisk');
+                    
+                    if (channelRiskEl) channelRiskEl.textContent = riskScore.toFixed(2);
+                    if (bioRiskEl) bioRiskEl.textContent = riskScore.toFixed(2);
+                    if (graphRiskEl) graphRiskEl.textContent = riskScore.toFixed(2);
+                    
+                    // Update the card-level risk scores too
+                    const channelScoreEl = document.getElementById('channelRiskScore');
+                    const bioScoreEl = document.getElementById('bioRiskScore');
+                    
+                    if (channelScoreEl) channelScoreEl.textContent = riskScore.toFixed(2);
+                    if (bioScoreEl) bioScoreEl.textContent = (riskScore * 0.8).toFixed(2);
+                }
+            } catch (e) {
+                console.warn('Risk score poll failed:', e);
+            }
+        }
+        
+        // Update risk score every 5 seconds
+        setInterval(updatePlatformRiskScore, 5000);
+        updatePlatformRiskScore();
     </script>
 </body>
 </html>

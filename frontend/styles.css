@@ -1415,6 +1415,16 @@ html, body {
     overflow: hidden;
 }
 
+/* Push risk distribution bars to bottom */
+.risk-distribution .card-body {
+    justify-content: flex-end !important;
+    padding-bottom: 8px;
+}
+
+.risk-distribution .distribution-bars {
+    margin-top: auto;
+}
+
 /* Make charts responsive within cards */
 .bottom-stats .card-body canvas {
     max-height: 100%;
@@ -1424,7 +1434,8 @@ html, body {
 .distribution-bars {
     display: flex;
     gap: 16px;
-    height: 120px;
+    height: 100%;
+    min-height: 120px;
     align-items: flex-end;
 }
 
@@ -1790,6 +1801,9 @@ html, body {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 120px);
 }
 
 .history-header {
@@ -1823,6 +1837,8 @@ html, body {
 
 .history-table-container {
     overflow-x: auto;
+    overflow-y: auto;
+    flex: 1;
 }
 
 /* Settings Page Specific */

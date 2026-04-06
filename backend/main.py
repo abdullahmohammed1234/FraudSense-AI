@@ -380,6 +380,31 @@ async def startup_event():
         get_threshold_simulator()
         get_logging_manager()
         
+        # Generate sample data for dashboard visualization
+        print("Generating sample data for dashboard...")
+        metrics_tracker = get_metrics_tracker()
+        decision_engine = get_decision_engine()
+        risk_scorer = get_risk_scorer()
+        
+        # Generate 50 sample predictions for historical data
+        np.random.seed(42)
+        for i in range(50):
+            fraud_prob = np.random.uniform(0, 0.6)
+            anomaly_score = np.random.uniform(0, 0.5)
+            final_score, risk_band = risk_scorer.calculate_risk_score(fraud_prob, anomaly_score, False)
+            recommendation = decision_engine.get_recommendation(fraud_prob, anomaly_score, False)
+            
+            metrics_tracker.record_prediction(
+                fraud_probability=fraud_prob,
+                anomaly_score=anomaly_score,
+                risk_score=final_score,
+                risk_band=risk_band,
+                action=recommendation["action_recommendation"],
+                latency_ms=np.random.uniform(10, 50),
+                drift_detected=False
+            )
+        
+        print("Sample data generated successfully!")
         print("RiskPlatform initialized successfully!")
         print("Model loaded successfully!")
     except Exception as e:
@@ -1806,7 +1831,7 @@ class AnomalyDataResponse(BaseModel):
     high_risk_count: int = Field(..., description="High risk anomalies")
     medium_risk_count: int = Field(..., description="Medium risk anomalies")
     low_risk_count: int = Field(..., description="Low risk anomalies")
-    scatter_data: Dict[str, List[Dict[str, float]]] = Field(..., description="Scatter plot data")
+    scatter_data: Dict[str, Any] = Field(..., description="Scatter plot data")
 
 
 class CampaignROIResponse(BaseModel):

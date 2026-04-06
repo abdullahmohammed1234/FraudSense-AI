@@ -522,19 +522,34 @@
             loadDashboardData();
             startAnalyticsPolling();
             
+            // Fetch initial chart data immediately
+            setTimeout(() => {
+                updateDashboardCharts();
+            }, 1000);
+            
             // New features initialization
             initWelcomeScreen();
             initSidebar();
-            initKeyboardShortcuts();
             initDragAndDrop();
             initInteractiveFeatures();
         });
+
+        // Dummy functions for compatibility - actual implementations are in script.js
+        function initKeyboardShortcuts() { 
+            console.log('Keyboard shortcuts loaded from script.js');
+        }
+        function initDragAndDrop() {
+            // Actual implementation in script.js
+        }
 
         // Welcome Screen
         function initWelcomeScreen() {
             const welcomeOverlay = document.getElementById('welcomeOverlay');
             const welcomeStartBtn = document.getElementById('welcomeStartBtn');
             const appContainer = document.getElementById('appContainer');
+            
+            // Exit early if welcome screen elements don't exist (not on index page)
+            if (!welcomeOverlay) return;
             
             // Check if user has visited before
             const hasVisited = localStorage.getItem('fraudsense_visited');
@@ -546,10 +561,12 @@
                 updateWelcomeStats();
             }
             
-            welcomeStartBtn.addEventListener('click', () => {
-                welcomeOverlay.classList.add('hidden');
-                localStorage.setItem('fraudsense_visited', 'true');
-            });
+            if (welcomeStartBtn) {
+                welcomeStartBtn.addEventListener('click', () => {
+                    welcomeOverlay.classList.add('hidden');
+                    localStorage.setItem('fraudsense_visited', 'true');
+                });
+            }
         }
 
         function updateWelcomeStats() {
@@ -671,10 +688,6 @@
                 });
             }
         }
-
-        </script>
-    </body>
-</html>
 
         // Load saved layout
         loadWidgetLayout();

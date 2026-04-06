@@ -29,7 +29,7 @@ class ModelMetadata:
         threshold: float = 0.5,
         dataset_size: int = 0,
         feature_count: int = 30,
-        version: str = "1.0.0",
+        version: str = "2.0.0",
         additional_info: Optional[Dict[str, Any]] = None
     ):
         self.model_type = model_type
@@ -70,7 +70,7 @@ class ModelMetadata:
             threshold=data.get("threshold", 0.5),
             dataset_size=data.get("dataset_size", 0),
             feature_count=data.get("feature_count", 30),
-            version=data.get("version", "1.0.0"),
+            version=data.get("version", "2.0.0"),
             additional_info={k: v for k, v in data.items() 
                            if k not in ["model_type", "training_date", "ROC_AUC", 
                                        "precision", "recall", "threshold", 

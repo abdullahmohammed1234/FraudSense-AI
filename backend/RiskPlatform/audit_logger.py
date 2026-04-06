@@ -322,7 +322,7 @@ if __name__ == "__main__":
         drift_detected=False,
         risk_level="High",
         threshold_used=0.5,
-        model_version="1.0.0",
+        model_version="2.0.0",
         top_risk_factors=[
             {"feature": "V14", "impact": 0.45},
             {"feature": "V17", "impact": 0.32}

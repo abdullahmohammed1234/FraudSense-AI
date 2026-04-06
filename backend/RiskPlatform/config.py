@@ -90,7 +90,7 @@ class GovernanceConfig:
     AUTO_CREATE_LOGS: bool = True
     
     # Model version
-    MODEL_VERSION: str = "1.0.0"
+    MODEL_VERSION: str = "2.0.0"
     
     # Default threshold
     DEFAULT_THRESHOLD: float = 0.5

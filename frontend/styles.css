@@ -1593,6 +1593,79 @@ html, body {
     display: flex;
 }
 
+/* Shortcuts Modal Overlay */
+.shortcuts-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.shortcuts-modal-overlay.active {
+    display: flex;
+}
+
+.shortcuts-modal {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+}
+
+.shortcuts-modal.active {
+    display: flex;
+}
+
+.shortcuts-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.shortcuts-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.shortcuts-modal .modal-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.shortcuts-modal .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.shortcuts-modal .modal-close:hover {
+    color: var(--text-primary);
+}
+
+.shortcuts-modal .modal-body {
+    padding: 20px;
+}
+
 .modal-content {
     background: var(--bg-card);
     border-radius: var(--radius-lg);

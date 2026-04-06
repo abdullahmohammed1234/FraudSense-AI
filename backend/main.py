@@ -1374,6 +1374,19 @@ async def get_fairness_metrics(attribute: str = "amount_tier"):
     monitor = get_fairness_monitor()
     protected_attr = ProtectedAttribute(attribute)
     metrics = monitor.calculate_fairness_metrics(protected_attr)
+    
+    if "error" in metrics:
+        return FairnessMetricsResponse(
+            protected_attribute=attribute,
+            groups={},
+            overall_metrics={},
+            bias_detected=False,
+            recommendations=["Insufficient data recorded for fairness analysis. Continue making predictions to build up statistics."],
+            disparate_impact={"value": None, "status": "insufficient_data"},
+            demographic_parity={"value": None, "status": "insufficient_data"},
+            equalized_odds={"value": None, "status": "insufficient_data"}
+        )
+    
     return FairnessMetricsResponse(**metrics)
 
 

@@ -147,7 +147,7 @@ python train.py
 ### Port already in use
 Change the port:
 ```bash
-python -m uvicorn main:app --port 8001
+python -m uvicorn main:app --port 8000
 ```
 
 ### Check logs

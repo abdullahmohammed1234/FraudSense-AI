@@ -34,7 +34,6 @@ FraudSense AI addresses these challenges through a multi-model approach:
 | Multi-model Detection | Ensemble of LR, RF, XGBoost, LSTM, Autoencoder, Stacking |
 | SHAP Explainability | Feature-level explanations for every prediction |
 | Real-time Inference | Sub-10ms prediction latency |
-| Drift Detection | Monitors data distribution changes |
 | Model Health Monitoring | Continuous performance tracking |
 | Online Learning | Incremental model updates |
 | Transfer Learning | Cross-domain knowledge transfer |
@@ -198,19 +197,12 @@ Actual  ----------+---------+---------+
 cd FraudSense AI
 ```
 
-2. Create and activate virtual environment:
-```bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate   # Linux/Mac
-```
-
-3. Install dependencies:
+2. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Download the dataset:
+3. Download the dataset:
    - Download from: https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud
    - Place creditcard.csv in the project root
 
@@ -233,19 +225,12 @@ This will:
 ### Option 1: Direct Python
 ```bash
 cd backend
-python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### Option 2: Docker
 ```bash
 docker-compose up --build
-```
-
-### Option 3: Already Trained (Quick Start)
-The model is already trained. Run:
-```bash
-cd backend
-python -m uvicorn main:app --host 0.0.0.0 --port 8001
 ```
 
 ## API Endpoints
@@ -271,10 +256,10 @@ python -m uvicorn main:app --host 0.0.0.0 --port 8001
 ## Frontend Dashboard
 
 Access the web interface at:
-- Main: http://localhost:8001/
-- Dashboard: http://localhost:8001/dashboard
-- Analysis: http://localhost:8001/analysis
-- History: http://localhost:8001/history
+- Main: http://localhost:800/
+- Dashboard: http://localhost:8000/dashboard
+- Analysis: http://localhost:8000/analysis
+- History: http://localhost:8000/history
 
 ## Authentication
 
@@ -294,7 +279,7 @@ X-API-Key: dev-key-001
 ## Example API Call
 
 ```bash
-curl -X POST http://localhost:8001/predict \
+curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -H "X-API-Key: dev-key-001" \
   -d '{
@@ -313,7 +298,7 @@ curl -X POST http://localhost:8001/predict \
 
 Create .env from .env.example:
 ```env
-API_PORT=8001
+API_PORT=8000
 LOG_LEVEL=INFO
 API_KEYS=dev-key-001:Admin:1000,analyst-key-001:Analyst:500,auditor-key-001:Auditor:200
 ```
@@ -321,7 +306,6 @@ API_KEYS=dev-key-001:Admin:1000,analyst-key-001:Analyst:500,auditor-key-001:Audi
 ## Risk Management Features
 
 - **Real-time Detection**: Sub-10ms inference time
-- **Drift Detection**: Monitors for data distribution changes
 - **Model Health Monitoring**: Continuous performance tracking
 - **Audit Logging**: Complete transaction trail
 - **Threshold Optimization**: Configurable risk thresholds
